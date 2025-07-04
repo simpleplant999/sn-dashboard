@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
@@ -9,12 +11,19 @@ function MainLayout({ children }: { children: React.ReactNode }) {
               <div className="bg-slate-300 rounded-full w-[150px] h-[150px]"></div>
             </div>
             <div>
-              <div className="px-5 py-3 border-b">
-                <p className="font-medium">Transactions</p>
-              </div>
-              <div className="px-5 py-3 border-b">
+              <Link href="/transactions" >
+                <div className="px-5 py-3 border-b cursor-pointer">
+                  <p className="font-medium">Transactions</p>
+                </div>
+              </Link>
+              <div className="px-5 py-3 border-b cursor-pointer">
                 <p className="font-medium">EUF Bot Config</p>
               </div>
+              <Link href="/ports" >
+              <div className="px-5 py-3 border-b cursor-pointer">
+                <p className="font-medium">Ports</p>
+              </div>
+              </Link>
             </div>
           </div>
         </div>
@@ -28,7 +37,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             {children}
           </div>
         </div>
-      </div>
+      </div >
     </>
   )
 }
