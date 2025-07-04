@@ -52,8 +52,8 @@ export function PortsTable({
                   <EllipsisVertical className="cursor-pointer" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem className="cursor-pointer" onClick={() => onEdit(port)}><Pen className="me-1" />Edit</DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer" onClick={() => onDelete(port.id)}><div className="flex gap-1 text-red-500"><Trash className="text-red-500"/> Delete</div></DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => onEdit(port)}><div className="flex items-center gap-2"><Pen className=""/> Edit</div></DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => onDelete(port.id)}><div className="flex items-center gap-2 text-red-500"><Trash className="text-red-500"/> Delete</div></DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>
