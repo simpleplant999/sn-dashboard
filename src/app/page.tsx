@@ -20,7 +20,7 @@ export default function Home() {
             </div>
             <Input type="password" id="password" placeholder="Password" />
           </div>
-          <Link href={'/dashboard'}>
+          <Link href={'/transactions'}>
           <Button className="w-full">Login</Button>
           </Link>
         </div>
