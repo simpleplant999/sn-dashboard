@@ -16,18 +16,21 @@ import {
 
 type Port = {
   id: string
-  portName: string
-  price: number
-  description: string
+  name: string
+  address: string
+  hardcode: string
+  long_lat: string
+  created: string
+  created_by: string
+  updated: string;
+  updated_by: string
 }
 
 export function PortsTable({
   ports,
-  onEdit,
   onDelete
 }: {
   ports: Port[]
-  onEdit: (port: Port) => void
   onDelete: (id: string) => void
 }) {
   return (
@@ -43,17 +46,19 @@ export function PortsTable({
       <TableBody>
         {ports?.map((port: Port, index: number) => (
           <TableRow key={index}>
-            <TableCell className="font-medium">{port.portName}</TableCell>
-            <TableCell>{port.price}</TableCell>
-            <TableCell className="capitalize">{port.description}</TableCell>
+            <TableCell className="font-medium">{port.name}</TableCell>
+            <TableCell>{port.address}</TableCell>
+            <TableCell>{port.created_by}</TableCell>
+            {/* <TableCell>{port.price}</TableCell> */}
+            {/* <TableCell className="capitalize">{port.description}</TableCell> */}
             <TableCell className="flex justify-end text-right">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <EllipsisVertical className="cursor-pointer" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem className="cursor-pointer" onClick={() => onEdit(port)}><div className="flex items-center gap-2"><Pen className=""/> Edit</div></DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer" onClick={() => onDelete(port.id)}><div className="flex items-center gap-2 text-red-500"><Trash className="text-red-500"/> Delete</div></DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer"><div className="flex items-center gap-2"><Pen className="" /> Edit</div></DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => onDelete(port.id)}><div className="flex items-center gap-2 text-red-500"><Trash className="text-red-500" /> Delete</div></DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>
