@@ -17,7 +17,7 @@ export const fetchApi = async <T>(
   const token =
     typeof window !== "undefined" ? localStorage.getItem("auth-token") : null;
 
-  console.log('token', token)
+  console.log("token", token);
   try {
     const url = `${baseURL}${endpoint}`;
 
