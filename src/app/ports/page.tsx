@@ -11,15 +11,32 @@ import {
 import { useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { useQuery } from "@tanstack/react-query"
+import { fetchApi } from "@/lib/fetchAPI"
 
 type Port = {
   id: string
-  portName: string
-  price: number
-  description: string
+  name: string
+  address: string
+  hardcode: string
+  long_lat: string
+  created: string
+  created_by: string
+  updated: string;
+  updated_by: string
 }
 
 function Ports() {
+
+  const { data } = useQuery<Port[]>({
+    queryKey: ['ports'],
+    queryFn: async () => await fetchApi<Port[]>('/ports', { auth: true }),
+  })
+
+  useEffect(() => {
+    console.log('HERE:::', data)
+    setPorts(data || [])
+  }, [data])
 
   const [portName, setPortName] = useState("")
   const [price, setPrice] = useState("")
@@ -29,60 +46,28 @@ function Ports() {
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean, portId: string | null }>({ isOpen: false, portId: null })
   const [ports, setPorts] = useState<Port[]>([])
 
-  useEffect(() => {
-    setPorts([
-      {
-        id: "1",
-        portName: "White Beach",
-        description: "Famous white sand beach with crystal clear waters",
-        price: 160.0,
-      },
-      {
-        id: "2",
-        portName: "Sabang Beach",
-        description: "Popular beach known for diving and nightlife",
-        price: 160.0,
-      },
-      {
-        id: "3",
-        portName: "Muelle Port",
-        description: "Historic port area with scenic views",
-        price: 160.0,
-      },
-      {
-        id: "4",
-        portName: "Tamaraw Falls",
-        description: 'Beautiful waterfall with natural swimming pools',
-        price: 160.0,
-      },
-      {
-        id: "5",
-        portName: "Puerto Galera Yacht Club",
-        description: 'Exclusive yacht club with marina facilities',
-        price: 160.0,
-      },
-    ]);
-  }, []);
+
+
 
   const handleSave = () => {
     if (portName.trim() && description.trim() && price.trim()) {
       if (editingPort) {
         // Update existing port
-        setPorts(ports.map(port =>
-          port.id === editingPort.id
-            ? { ...port, portName: portName.trim(), description: description.trim(), price: parseFloat(price) }
-            : port
-        ))
-        setEditingPort(null)
+        // setPorts(ports.map(port =>
+        //   port.id === editingPort.id
+        //     ? { ...port, portName: portName.trim(), description: description.trim(), price: parseFloat(price) }
+        //     : port
+        // ))
+        // setEditingPort(null)
       } else {
         // Add new port
-        const newPort = {
-          id: (ports.length + 1).toString(),
-          portName: portName.trim(),
-          description: description.trim(),
-          price: parseFloat(price),
-        }
-        setPorts([...ports, newPort])
+        // const newPort = {
+        //   id: (ports.length + 1).toString(),
+        //   portName: portName.trim(),
+        //   description: description.trim(),
+        //   price: parseFloat(price),
+        // }
+        // setPorts([...ports, newPort])
       }
 
       setPortName("")
@@ -92,13 +77,13 @@ function Ports() {
     }
   }
 
-  const handleEdit = (port: { id: string, portName: string, price: number, description: string }) => {
-    setEditingPort(port)
-    setPortName(port.portName)
-    setPrice(port.price.toString())
-    setDescription(port.description)
-    setIsOpen(true)
-  }
+  // const handleEdit = (port: { id: string, portName: string, price: number, description: string }) => {
+  //   setEditingPort(port)
+  //   setPortName(port.portName)
+  //   setPrice(port.price.toString())
+  //   setDescription(port.description)
+  //   setIsOpen(true)
+  // }
 
   const handleDelete = (id: string) => {
     setDeleteConfirm({ isOpen: true, portId: id })
@@ -150,7 +135,7 @@ function Ports() {
                   }} />
                 </div>
                 <div className="gap-2 grid grid-cols-2 mt-5">
-                <Button variant="outline" className="cursor-pointer" onClick={handleClose}>Cancel</Button>
+                  <Button variant="outline" className="cursor-pointer" onClick={handleClose}>Cancel</Button>
                   <Button className="w-full cursor-pointer" onClick={() => { handleSave() }}>Save</Button>
                 </div>
               </div>
@@ -186,7 +171,7 @@ function Ports() {
             }}>Add New</Button>
           </div>
           <div className="bg-white p-5 rounded-xl">
-            <PortsTable ports={ports} onEdit={handleEdit} onDelete={handleDelete} />
+            <PortsTable ports={ports} onDelete={handleDelete} />
           </div>
         </MainLayout>
       </div>
