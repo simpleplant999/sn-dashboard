@@ -11,7 +11,7 @@ import {
 import { useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { fetchApi } from "@/lib/fetchAPI"
 
 type Port = {
@@ -22,8 +22,9 @@ type Port = {
   long_lat: string
   created: string
   created_by: string
-  updated: string;
+  updated: string
   updated_by: string
+  price: string
 }
 
 function Ports() {
@@ -33,66 +34,96 @@ function Ports() {
     queryFn: async () => await fetchApi<Port[]>('/ports', { auth: true }),
   })
 
-  useEffect(() => {
-    console.log('HERE:::', data)
-    setPorts(data || [])
-  }, [data])
-
   const [portName, setPortName] = useState("")
+  const [address, setAddress] = useState("")
   const [price, setPrice] = useState("")
-  const [description, setDescription] = useState("")
   const [isOpen, setIsOpen] = useState(false)
-  const [editingPort, setEditingPort] = useState<{ id: string, portName: string, price: number, description: string } | null>(null)
+  const [editingPort, setEditingPort] = useState<Port | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean, portId: string | null }>({ isOpen: false, portId: null })
-  const [ports, setPorts] = useState<Port[]>([])
 
+  const queryClient = useQueryClient()
 
+  // Add a new port with all required fields
+  const addPort = async (portName: string, address: string, price: string) => {
+    const newPort: Omit<Port, 'id'> = {
+      name: portName,
+      address: address,
+      hardcode: portName,     // Temporarily store price in hardc3ode
+      long_lat: 'test',
+      created: new Date().toISOString(),
+      created_by: 'user',
+      updated: new Date().toISOString(),
+      updated_by: 'user',
+      price: price
+    };
+    console.log(newPort)
+    await fetchApi<Port>('/ports', {
+      method: 'POST',
+      body: JSON.stringify(newPort),
+      auth: true,
+    });
+    // Optionally, you can refetch ports here or optimistically update
+    // For now, let's refetch using the query
+    const updatedPorts = await fetchApi<Port[]>('/ports', { auth: true });
+    queryClient.invalidateQueries({ queryKey: ['ports'] });
+  };
 
-
-  const handleSave = () => {
-    if (portName.trim() && description.trim() && price.trim()) {
+  const handleSave = async () => {
+    if (portName && address) {
       if (editingPort) {
         // Update existing port
-        // setPorts(ports.map(port =>
-        //   port.id === editingPort.id
-        //     ? { ...port, portName: portName.trim(), description: description.trim(), price: parseFloat(price) }
-        //     : port
-        // ))
-        // setEditingPort(null)
+        const updatedPort: Omit<Port, 'id'> = {
+          name: portName,
+          address: address,
+          hardcode: portName,
+          long_lat: 'test',
+          created: editingPort.created || new Date().toISOString(),
+          created_by: editingPort.created_by || 'user',
+          updated: new Date().toISOString(),
+          updated_by: 'user',
+          price: price
+        };
+        await fetchApi<Port>(`/ports/${editingPort.id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(updatedPort),
+          auth: true,
+        });
+        queryClient.invalidateQueries({ queryKey: ['ports'] });
+        setEditingPort(null);
       } else {
-        // Add new port
-        // const newPort = {
-        //   id: (ports.length + 1).toString(),
-        //   portName: portName.trim(),
-        //   description: description.trim(),
-        //   price: parseFloat(price),
-        // }
-        // setPorts([...ports, newPort])
+        console.log('add new')
+        await addPort(portName, address, price);
       }
-
       setPortName("")
-      setPrice("")
-      setDescription("")
+      setAddress("")
       setIsOpen(false)
     }
   }
 
-  // const handleEdit = (port: { id: string, portName: string, price: number, description: string }) => {
-  //   setEditingPort(port)
-  //   setPortName(port.portName)
-  //   setPrice(port.price.toString())
-  //   setDescription(port.description)
-  //   setIsOpen(true)
-  // }
+  const handleEdit = (port: Port) => {
+    setEditingPort(port)
+    setPortName(port.name)
+    setAddress(port.address)
+    setPrice(port.price)
+    setIsOpen(true)
+  }
 
   const handleDelete = (id: string) => {
     setDeleteConfirm({ isOpen: true, portId: id })
   }
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteConfirm.portId) {
-      setPorts(ports.filter(port => port.id !== deleteConfirm.portId))
-      setDeleteConfirm({ isOpen: false, portId: null })
+      try {
+        await fetchApi(`/ports/${deleteConfirm.portId}`, {
+          method: 'DELETE',
+          auth: true,
+        });
+        queryClient.invalidateQueries({ queryKey: ['ports'] });
+        setDeleteConfirm({ isOpen: false, portId: null });
+      } catch (error) {
+        setDeleteConfirm({ isOpen: false, portId: null });
+      }
     }
   }
 
@@ -104,8 +135,7 @@ function Ports() {
     setIsOpen(false)
     setEditingPort(null)
     setPortName("")
-    setPrice("")
-    setDescription("")
+    setAddress("")
   }
 
   return (
@@ -123,9 +153,9 @@ function Ports() {
                   }} />
                 </div>
                 <div className="items-center gap-3 grid w-full">
-                  <Label>Description</Label>
-                  <Input type="text" value={description} onChange={(e) => {
-                    setDescription(e.target.value)
+                  <Label>Address</Label>
+                  <Input type="text" value={address} onChange={(e) => {
+                    setAddress(e.target.value)
                   }} />
                 </div>
                 <div className="items-center gap-3 grid w-full">
@@ -136,7 +166,10 @@ function Ports() {
                 </div>
                 <div className="gap-2 grid grid-cols-2 mt-5">
                   <Button variant="outline" className="cursor-pointer" onClick={handleClose}>Cancel</Button>
-                  <Button className="w-full cursor-pointer" onClick={() => { handleSave() }}>Save</Button>
+                  <Button className="w-full cursor-pointer" onClick={() => {
+                    console.log('test')
+                    handleSave()
+                  }}>Save</Button>
                 </div>
               </div>
             </DialogHeader>
@@ -165,13 +198,13 @@ function Ports() {
             <Button className="cursor-pointer" onClick={() => {
               setEditingPort(null)
               setPortName("")
+              setAddress("")
               setPrice("")
-              setDescription("")
               setIsOpen(true)
             }}>Add New</Button>
           </div>
           <div className="bg-white p-5 rounded-xl">
-            <PortsTable ports={ports} onDelete={handleDelete} />
+            <PortsTable ports={data || []} onDelete={handleDelete} onEdit={handleEdit} />
           </div>
         </MainLayout>
       </div>
