@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useRemoveAuthToken } from "@/hooks/useAuthToken"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
 
 
 function MainLayout({ children }: { children: React.ReactNode }) {
