@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
@@ -64,7 +64,7 @@ function Ports() {
     });
     // Optionally, you can refetch ports here or optimistically update
     // For now, let's refetch using the query
-    const updatedPorts = await fetchApi<Port[]>('/ports', { auth: true });
+    // const updatedPorts = await fetchApi<Port[]>('/ports', { auth: true });
     queryClient.invalidateQueries({ queryKey: ['ports'] });
   };
 
@@ -122,6 +122,7 @@ function Ports() {
         queryClient.invalidateQueries({ queryKey: ['ports'] });
         setDeleteConfirm({ isOpen: false, portId: null });
       } catch (error) {
+        console.log(error)
         setDeleteConfirm({ isOpen: false, portId: null });
       }
     }
