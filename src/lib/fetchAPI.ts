@@ -15,9 +15,9 @@ export const fetchApi = async <T>(
   options: FetchOptions = {}
 ): Promise<T> => {
   const token =
-    typeof window !== "undefined" ? localStorage.getItem("auth-token") : null;
+  typeof window !== "undefined" ? localStorage.getItem("auth-token") : null;
 
-  console.log("token", token);
+
   try {
     const url = `${baseURL}${endpoint}`;
 
@@ -47,6 +47,11 @@ export const fetchApi = async <T>(
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
       throw new Error(error?.message || `Fetch error: ${response.status}`);
+    }
+
+    // Handle empty response (204 No Content)
+    if (response.status === 204) {
+      return null as T;
     }
 
     return response.json();

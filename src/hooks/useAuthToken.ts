@@ -17,3 +17,11 @@ export const useAuthToken = () => {
     initialData: () => localStorage.getItem('auth-token'),
   })
 }
+
+export const useRemoveAuthToken = () => {
+  const queryClient = useQueryClient();
+  return () => {
+    queryClient.removeQueries({ queryKey: ['auth-token'] });
+    localStorage.removeItem('auth-token');
+  };
+}

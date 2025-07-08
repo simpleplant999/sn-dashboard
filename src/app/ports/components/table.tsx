@@ -23,23 +23,28 @@ type Port = {
   created: string
   created_by: string
   updated: string;
+  price: string;
   updated_by: string
+  
+
 }
 
 export function PortsTable({
   ports,
-  onDelete
+  onDelete,
+  onEdit
 }: {
   ports: Port[]
   onDelete: (id: string) => void
+  onEdit: (port: Port) => void
 }) {
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
+          <TableHead>Address</TableHead>
           <TableHead>Price</TableHead>
-          <TableHead>Description</TableHead>
           <TableHead className="text-right">Action</TableHead>
         </TableRow>
       </TableHeader>
@@ -48,7 +53,7 @@ export function PortsTable({
           <TableRow key={index}>
             <TableCell className="font-medium">{port.name}</TableCell>
             <TableCell>{port.address}</TableCell>
-            <TableCell>{port.created_by}</TableCell>
+            <TableCell>{port.price}</TableCell>
             {/* <TableCell>{port.price}</TableCell> */}
             {/* <TableCell className="capitalize">{port.description}</TableCell> */}
             <TableCell className="flex justify-end text-right">
@@ -57,7 +62,7 @@ export function PortsTable({
                   <EllipsisVertical className="cursor-pointer" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem className="cursor-pointer"><div className="flex items-center gap-2"><Pen className="" /> Edit</div></DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => onEdit(port)}><div className="flex items-center gap-2"><Pen className="" /> Edit</div></DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer" onClick={() => onDelete(port.id)}><div className="flex items-center gap-2 text-red-500"><Trash className="text-red-500" /> Delete</div></DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
