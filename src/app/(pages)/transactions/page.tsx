@@ -128,23 +128,23 @@ function Transactions() {
     }
   }
 
-  const handleEdit = (transaction: Transaction) => {
-    setEditingPort(transaction)
-    setType(transaction.type)
-    setApp(transaction.app)
-    setPaymentGateway(transaction.payment_gateway)
-    setTransactionNumber(transaction.transaction_number)
-    setPaymentStatus(transaction.payment_status)
-    setPaymentReferenceCode(transaction.payment_reference_code)
-    setEufPort(transaction.euf_port)
-    setAccountId(transaction.account_id)
-    setPrice(transaction.price)
-    setIsOpen(true)
-  }
+  // const handleEdit = (transaction: Transaction) => {
+  //   setEditingPort(transaction)
+  //   setType(transaction.type)
+  //   setApp(transaction.app)
+  //   setPaymentGateway(transaction.payment_gateway)
+  //   setTransactionNumber(transaction.transaction_number)
+  //   setPaymentStatus(transaction.payment_status)
+  //   setPaymentReferenceCode(transaction.payment_reference_code)
+  //   setEufPort(transaction.euf_port)
+  //   setAccountId(transaction.account_id)
+  //   setPrice(transaction.price)
+  //   setIsOpen(true)
+  // }
 
-  const handleDelete = (id: string) => {
-    setDeleteConfirm({ isOpen: true, portId: id })
-  }
+  // const handleDelete = (id: string) => {
+  //   setDeleteConfirm({ isOpen: true, portId: id })
+  // }
 
   const confirmDelete = async () => {
     if (deleteConfirm.portId) {
@@ -258,7 +258,7 @@ function Transactions() {
             }}>Add New</Button> */}
           </div>
           <div className="bg-white p-5 rounded-xl">
-            <TransactionsTable transactions={data?.transactions || []} onDelete={handleDelete} onEdit={handleEdit} />
+            <TransactionsTable transactions={data?.transactions || []} />
           </div>
         </MainLayout>
       </div>
