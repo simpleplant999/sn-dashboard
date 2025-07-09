@@ -1,6 +1,6 @@
 'use client'
 import { Button } from "@/components/ui/button"
-import MainLayout from "../main"
+import MainLayout from "@/app/main"
 import { PortsTable } from "./components/table"
 import {
   Dialog,

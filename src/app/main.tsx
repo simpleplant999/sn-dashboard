@@ -17,7 +17,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => {
     removeAuthToken()
-    router.push("/login")
+    router.push("/")
   }
   // const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null
   // useEffect(() => {
@@ -65,22 +65,22 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         <div className="w-full">
           {/* navbar */}
           <div className="flex justify-end items-center px-5 border-b w-full h-[70px]">
-          
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                <div className="flex justify-center items-center bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full w-[40px] h-[40px]">
-              <Bot className="w-[30px] h-[30px] text-white" />
-            </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
-                    <div className="flex items-center gap-2">
-                      <PowerOff className="" /> Logout
-                    </div>
-                  </DropdownMenuItem>
 
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex justify-center items-center bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full w-[40px] h-[40px] cursor-pointer">
+                  <Bot className="w-[30px] h-[30px] text-white" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+                  <div className="flex items-center gap-2">
+                    <PowerOff className="" /> Logout
+                  </div>
+                </DropdownMenuItem>
+
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <div className="bg-blue-50 p-5 h-[calc(100vh-70px)]">
             {children}
