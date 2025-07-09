@@ -6,13 +6,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { EllipsisVertical, Pen, Trash } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
 type Transaction = {
   id: string
@@ -39,12 +32,8 @@ type Transaction = {
 
 export function TransactionsTable({
   transactions,
-  onDelete,
-  onEdit
 }: {
   transactions: Transaction[]
-  onDelete: (id: string) => void
-  onEdit: (transaction: Transaction) => void
 }) {
   return (
     <>
