@@ -29,7 +29,7 @@ export default function Login() {
       setError(false)
       setToken(res?.accessToken)
       if (res?.accessToken) {
-        window.location.href = "/ports";
+        window.location.href = "/transactions";
         setIsLoading(false)
       }
     } catch (error) {
