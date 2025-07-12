@@ -107,7 +107,7 @@ export function Pagination({
                 <span className="px-2 py-1 text-muted-foreground text-sm">...</span>
               ) : (
                 <Button
-                  variant={currentPage === page ? "default" : "outline"}
+                  variant={currentPage === page ? "default" : "outline"}  
                   size="sm"
                   onClick={() => onPageChange(page as number)}
                   className="w-8 h-8"
