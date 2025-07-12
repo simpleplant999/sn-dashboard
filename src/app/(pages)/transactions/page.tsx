@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useState } from "react"
+import { Pagination } from "@/components/ui/pagination"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
@@ -39,13 +40,19 @@ type Transaction = {
 
 type TransactionData = {
   transactions: Transaction[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
 }
 
 function Transactions() {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [limit, setLimit] = useState(10)
 
   const { data } = useQuery<TransactionData>({
-    queryKey: ['transactions'],
-    queryFn: async () => await fetchApi<TransactionData>('/transactions', { auth: true }),
+    queryKey: ['transactions', currentPage, limit],
+    queryFn: async () => await fetchApi<TransactionData>(`/transactions?page=${currentPage}&limit=${limit}`, { auth: true }),
   })
   const [isOpen, setIsOpen] = useState(false)
   const [editingPort, setEditingPort] = useState<Transaction | null>(null)
@@ -63,6 +70,15 @@ function Transactions() {
   const [price, setPrice] = useState("")
 
   const queryClient = useQueryClient()
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit)
+    setCurrentPage(1) // Reset to first page when changing limit
+  }
 
   // Add a new transaction with all required fields
   const addTransaction = async () => {
@@ -82,7 +98,7 @@ function Transactions() {
       body: JSON.stringify(newTransaction),
       auth: true,
     })
-    queryClient.invalidateQueries({ queryKey: ['transactions'] })
+    queryClient.invalidateQueries({ queryKey: ['transactions', currentPage, limit] })
   }
 
   const updateTransaction = async (id: string) => {
@@ -102,7 +118,7 @@ function Transactions() {
       body: JSON.stringify(updatedTransaction),
       auth: true,
     })
-    queryClient.invalidateQueries({ queryKey: ['transactions'] })
+    queryClient.invalidateQueries({ queryKey: ['transactions', currentPage, limit] })
   }
 
   const handleSave = async () => {
@@ -153,7 +169,7 @@ function Transactions() {
           method: 'DELETE',
           auth: true,
         });
-        queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        queryClient.invalidateQueries({ queryKey: ['transactions', currentPage, limit] });
         setDeleteConfirm({ isOpen: false, portId: null });
       } catch (error) {
         console.log(error)
@@ -259,6 +275,16 @@ function Transactions() {
           </div>
           <div className="bg-white p-5 rounded-xl">
             <TransactionsTable transactions={data?.transactions || []} />
+            {data && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={data.totalPages}
+                total={data.total}
+                limit={limit}
+                onPageChange={handlePageChange}
+                onLimitChange={handleLimitChange}
+              />
+            )}
           </div>
         </MainLayout>
       </div>
