@@ -17,6 +17,7 @@ type Transaction = {
   transaction_number: string
   payment_status: string
   payment_reference_code: string
+  finalAmount: string
   euf_port: string
   account_id: string
   creator_username: string
@@ -42,27 +43,33 @@ export function TransactionsTable({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Transaction Id</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>App</TableHead>
             <TableHead>Payment Gateway</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Amount</TableHead>
             <TableHead>Account Number</TableHead>
             <TableHead>Transaction Date</TableHead>
             {/* <TableHead className="text-right">Action</TableHead> */}
           </TableRow>
         </TableHeader>
         <TableBody>
-        {transactions?.map((transaction, index) => (
-          <TableRow key={index}>
-            <TableCell className="font-medium capitalize">{formatText(transaction?.type)}</TableCell>
-            <TableCell className="capitalize">{formatText(transaction?.app)}</TableCell>
-            <TableCell className="capitalize">{formatText(transaction?.payment_gateway)}</TableCell>
-            <TableCell className="capitalize">
-              <StatusBadge status={transaction?.payment_status} />
-            </TableCell>
-            <TableCell className="capitalize">{transaction?.water_billing_account?.account_number}</TableCell>
-            <TableCell className="capitalize">{moment(transaction?.created).format("lll")}</TableCell>
-            {/* <TableCell className="flex justify-end text-right">
+          {transactions?.map((transaction, index) => (
+            <TableRow key={index}>
+              <TableCell className="">{formatText(transaction?.transaction_number)}</TableCell>
+              <TableCell className="">{formatText(transaction?.type)}</TableCell>
+              <TableCell className="">{formatText(transaction?.app)}</TableCell>
+              <TableCell className="">{formatText(transaction?.payment_gateway)}</TableCell>
+              <TableCell className="">
+                <StatusBadge status={transaction?.payment_status} />
+              </TableCell>
+              <TableCell className="">
+                Php {transaction?.finalAmount}
+              </TableCell>
+              <TableCell className="">{transaction?.water_billing_account?.account_number}</TableCell>
+              <TableCell className="">{moment(transaction?.created).format("lll")}</TableCell>
+              {/* <TableCell className="flex justify-end text-right">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <EllipsisVertical className="cursor-pointer" />
@@ -73,9 +80,9 @@ export function TransactionsTable({
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell> */}
-          </TableRow>
-        ))}
-      </TableBody>
+            </TableRow>
+          ))}
+        </TableBody>
       </Table>
     </>
   )

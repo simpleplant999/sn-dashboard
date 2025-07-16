@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { useState } from "react"
+import { useState, ChangeEvent } from "react"
 import { Pagination } from "@/components/ui/pagination"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -22,6 +22,7 @@ type Transaction = {
   payment_gateway: string
   transaction_number: string
   payment_status: string
+  finalAmount: string
   payment_reference_code: string
   euf_port: string
   account_id: string
@@ -49,11 +50,27 @@ type TransactionData = {
 function Transactions() {
   const [currentPage, setCurrentPage] = useState(1)
   const [limit, setLimit] = useState(10)
+  const [transactionTypeFilter, setTransactionTypeFilter] = useState("")
 
   const { data } = useQuery<TransactionData>({
     queryKey: ['transactions', currentPage, limit],
     queryFn: async () => await fetchApi<TransactionData>(`/transactions?page=${currentPage}&limit=${limit}`, { auth: true }),
   })
+
+  // Filter transactions on the frontend
+  const filteredTransactions = data?.transactions?.filter(transaction => {
+    if (!transactionTypeFilter) return true // Show all if no filter
+    
+    if (transactionTypeFilter === 'euf') {
+      return transaction.euf_port && transaction.euf_port.trim() !== ''
+    }
+    
+    if (transactionTypeFilter === 'water_billing') {
+      return transaction.water_billing_account && transaction.water_billing_account.account_number
+    }
+    
+    return true
+  }) || []
   const [isOpen, setIsOpen] = useState(false)
   const [editingPort, setEditingPort] = useState<Transaction | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean, portId: string | null }>({ isOpen: false, portId: null })
@@ -80,6 +97,11 @@ function Transactions() {
     setCurrentPage(1) // Reset to first page when changing limit
   }
 
+  const handleFilterChange = (filter: string) => {
+    setTransactionTypeFilter(filter)
+    setCurrentPage(1) // Reset to first page when filtering
+  }
+
   // Add a new transaction with all required fields
   const addTransaction = async () => {
     const newTransaction = {
@@ -98,7 +120,7 @@ function Transactions() {
       body: JSON.stringify(newTransaction),
       auth: true,
     })
-    queryClient.invalidateQueries({ queryKey: ['transactions', currentPage, limit] })
+    queryClient.invalidateQueries({ queryKey: ['transactions'] })
   }
 
   const updateTransaction = async (id: string) => {
@@ -118,7 +140,7 @@ function Transactions() {
       body: JSON.stringify(updatedTransaction),
       auth: true,
     })
-    queryClient.invalidateQueries({ queryKey: ['transactions', currentPage, limit] })
+    queryClient.invalidateQueries({ queryKey: ['transactions'] })
   }
 
   const handleSave = async () => {
@@ -144,24 +166,6 @@ function Transactions() {
     }
   }
 
-  // const handleEdit = (transaction: Transaction) => {
-  //   setEditingPort(transaction)
-  //   setType(transaction.type)
-  //   setApp(transaction.app)
-  //   setPaymentGateway(transaction.payment_gateway)
-  //   setTransactionNumber(transaction.transaction_number)
-  //   setPaymentStatus(transaction.payment_status)
-  //   setPaymentReferenceCode(transaction.payment_reference_code)
-  //   setEufPort(transaction.euf_port)
-  //   setAccountId(transaction.account_id)
-  //   setPrice(transaction.price)
-  //   setIsOpen(true)
-  // }
-
-  // const handleDelete = (id: string) => {
-  //   setDeleteConfirm({ isOpen: true, portId: id })
-  // }
-
   const confirmDelete = async () => {
     if (deleteConfirm.portId) {
       try {
@@ -169,7 +173,7 @@ function Transactions() {
           method: 'DELETE',
           auth: true,
         });
-        queryClient.invalidateQueries({ queryKey: ['transactions', currentPage, limit] });
+        queryClient.invalidateQueries({ queryKey: ['transactions'] });
         setDeleteConfirm({ isOpen: false, portId: null });
       } catch (error) {
         console.log(error)
@@ -206,39 +210,39 @@ function Transactions() {
               <div className="flex flex-col gap-2 mt-5 w-full">
                 <div className="items-center gap-3 grid w-full">
                   <Label>Type</Label>
-                  <Input type="text" value={type} onChange={e => setType(e.target.value)} />
+                  <Input type="text" value={type} onChange={(e: ChangeEvent<HTMLInputElement>) => setType(e.target.value)} />
                 </div>
                 <div className="items-center gap-3 grid w-full">
                   <Label>App</Label>
-                  <Input type="text" value={app} onChange={e => setApp(e.target.value)} />
+                  <Input type="text" value={app} onChange={(e: ChangeEvent<HTMLInputElement>) => setApp(e.target.value)} />
                 </div>
                 <div className="items-center gap-3 grid w-full">
                   <Label>Payment Gateway</Label>
-                  <Input type="text" value={paymentGateway} onChange={e => setPaymentGateway(e.target.value)} />
+                  <Input type="text" value={paymentGateway} onChange={(e: ChangeEvent<HTMLInputElement>) => setPaymentGateway(e.target.value)} />
                 </div>
                 <div className="items-center gap-3 grid w-full">
                   <Label>Transaction Number</Label>
-                  <Input type="text" value={transactionNumber} onChange={e => setTransactionNumber(e.target.value)} />
+                  <Input type="text" value={transactionNumber} onChange={(e: ChangeEvent<HTMLInputElement>) => setTransactionNumber(e.target.value)} />
                 </div>
                 <div className="items-center gap-3 grid w-full">
                   <Label>Payment Status</Label>
-                  <Input type="text" value={paymentStatus} onChange={e => setPaymentStatus(e.target.value)} />
+                  <Input type="text" value={paymentStatus} onChange={(e: ChangeEvent<HTMLInputElement>) => setPaymentStatus(e.target.value)} />
                 </div>
                 <div className="items-center gap-3 grid w-full">
                   <Label>Payment Reference Code</Label>
-                  <Input type="text" value={paymentReferenceCode} onChange={e => setPaymentReferenceCode(e.target.value)} />
+                  <Input type="text" value={paymentReferenceCode} onChange={(e: ChangeEvent<HTMLInputElement>) => setPaymentReferenceCode(e.target.value)} />
                 </div>
                 <div className="items-center gap-3 grid w-full">
                   <Label>EUF Port</Label>
-                  <Input type="text" value={eufPort} onChange={e => setEufPort(e.target.value)} />
+                  <Input type="text" value={eufPort} onChange={(e: ChangeEvent<HTMLInputElement>) => setEufPort(e.target.value)} />
                 </div>
                 <div className="items-center gap-3 grid w-full">
                   <Label>Account ID</Label>
-                  <Input type="text" value={accountId} onChange={e => setAccountId(e.target.value)} />
+                  <Input type="text" value={accountId} onChange={(e: ChangeEvent<HTMLInputElement>) => setAccountId(e.target.value)} />
                 </div>
                 <div className="items-center gap-3 grid w-full">
                   <Label>Price</Label>
-                  <Input type="text" value={price} onChange={e => setPrice(e.target.value)} />
+                  <Input type="text" value={price} onChange={(e: ChangeEvent<HTMLInputElement>) => setPrice(e.target.value)} />
                 </div>
                 <div className="gap-2 grid grid-cols-2 mt-5">
                   <Button variant="outline" className="cursor-pointer" onClick={handleClose}>Cancel</Button>
@@ -274,7 +278,32 @@ function Transactions() {
             }}>Add New</Button> */}
           </div>
           <div className="bg-white p-5 rounded-xl">
-            <TransactionsTable transactions={data?.transactions || []} />
+            {/* Filter Buttons */}
+            <div className="hidden bg-gray-50 mb-6 p-4 border rounded-lg">
+              <h3 className="mb-4 font-medium text-lg">Filter by Transaction Type</h3>
+              <div className="flex gap-3">
+                <Button 
+                  variant={transactionTypeFilter === "" ? "default" : "outline"}
+                  onClick={() => handleFilterChange("")}
+                >
+                  All Transactions
+                </Button>
+                <Button 
+                  variant={transactionTypeFilter === "euf" ? "default" : "outline"}
+                  onClick={() => handleFilterChange("euf")}
+                >
+                  EUF Only
+                </Button>
+                <Button 
+                  variant={transactionTypeFilter === "water_billing" ? "default" : "outline"}
+                  onClick={() => handleFilterChange("water_billing")}
+                >
+                  Water Billing Only
+                </Button>
+              </div>
+            </div>
+            
+            <TransactionsTable transactions={filteredTransactions} />
             {data && (
               <Pagination
                 currentPage={currentPage}
